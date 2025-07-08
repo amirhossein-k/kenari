@@ -45,6 +45,12 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: "https",
+        hostname: "cdn.dummyjson.com",
+        port: "",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
         hostname: "marloo.storage.c2.liara.space",
         port: "",
         pathname: "/**",
