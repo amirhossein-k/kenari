@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import 'animate.css/animate.min.css';
+import "animate.css/animate.min.css";
 // import "react-image-gallery/styles/css/image-gallery.css";
 import "swiper/css";
 import "swiper/css/pagination";
@@ -9,9 +9,8 @@ import "swiper/css/navigation";
 // import SpinnerLyout from "@/components/spinner/SpinnerLyout";
 import { Toaster } from "react-hot-toast";
 import { Providers } from "./Providers";
-import { MainProvider } from "@/context/MainContext";
 import { HeroUIProvider } from "@heroui/system";
-
+import Head from "next/head";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -35,30 +34,30 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-         <head>
+      <Head>
+        <link
+          rel="stylesheet"
+          href="https://unpkg.com/swiper/css/swiper.min.css"
+        />
+        <link
+          rel="stylesheet"
+          href="https://unpkg.com/swiper/css/pagination.css"
+        />
         <link
           rel="stylesheet"
           href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
         />
-   
-      </head>
+      </Head>
+
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-        >
-          <HeroUIProvider>
-              
-                      <MainProvider> 
-
-                <Providers>
-
-            <Toaster position="top-center"  />
-          {children}
-               </Providers>
-                        </MainProvider>
-          </HeroUIProvider>
-
-
-
+        className={`${geistSans.variable} ${geistMono.variable} antialiased `}
+      >
+        <HeroUIProvider>
+          <Providers>
+            <Toaster position="top-center" />
+            {children}
+          </Providers>
+        </HeroUIProvider>
       </body>
     </html>
   );

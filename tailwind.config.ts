@@ -25,7 +25,11 @@ export default {
       boxShadow: {
         card: "0 0 30px #00000048",
         propvist_b:"0px 19px 50px -31px rgba(0, 0, 0, 0.3)",
-         propvist_t:"0px -16px 36px -6px rgba(0, 0, 0, 0.3)"
+         propvist_t:"0px -16px 36px -6px rgba(0, 0, 0, 0.3)",
+        box1:'rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px',
+        box2:' rgba(50, 50, 93, 0.25) 0px 30px 60px -12px inset, rgba(0, 0, 0, 0.3) 0px 18px 36px -18px inset',
+        box3:' rgba(255, 255, 255, 0.2) 0px 0px 0px 1px inset, rgba(0, 0, 0, 0.9) 0px 0px 0px 1px',
+        box4:' rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px'
       },
     },
   },

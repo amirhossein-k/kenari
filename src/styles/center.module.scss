@@ -7,6 +7,16 @@
   &::-webkit-scrollbar {
     display: none; /* مخفی کردن اسکرولبار در مرورگرهای WebKit */
   }
+  &::-webkit-scrollbar {
+    width: 0.5rem;
+    height: 0.5rem;
+    cursor: pointer;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: rgb(242, 242, 242);
+    border-radius: 1rem;
+  }
 }
 
 .container_center {

@@ -1,11 +1,11 @@
-
+// src\features\SpinnerNav.tsx
   'use client';
-  import { MainContext } from '@/context/MainContext';
+import { RootState } from '@/store';
   import { Spinner } from '@heroui/react';
-  import React, { useContext } from 'react';
+import { useSelector } from 'react-redux';
 
   const SpinnersNav = () => {
-    const { loading } = useContext(MainContext);
+    const  { loading} = useSelector((state:RootState)=>state.products)
 
     return (
       <div

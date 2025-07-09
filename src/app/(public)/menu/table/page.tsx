@@ -1,14 +1,21 @@
 
 'use client';
-import React, { useEffect, useRef, useContext, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { TiThMenu } from 'react-icons/ti';
 import { FaAngleLeft } from 'react-icons/fa';
 import { Skeleton } from '@heroui/skeleton';
 import Image from 'next/image';
 import SpinnersNav from '@/features/SpinnerNav';
-import { MainContext } from '@/context/MainContext';
+// import { MainContext } from '@/context/MainContext';
 import toast from 'react-hot-toast';
+import Link from 'next/link';
+import { RootState } from '@/store';
+import { setProducts,setLoading } from '@/store/productSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import {setOpenNav} from '@/store/navbarSlice'
+import styles from '@/styles/center.module.scss'
+import { FaRegPlusSquare } from "react-icons/fa";
 
 // تعریف تایپ برای محصولات
 interface Product {
@@ -64,25 +71,36 @@ const fetchProducts = async (): Promise<Product[]> => {
 };
 
 const Tablepage = () => {
+  const dispatch = useDispatch()
   const [activeSelector, setActiveSelector] = React.useState(selector[0]?.title || 'beauty');
   const sectionRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
   const prevActiveSelector = useRef(activeSelector);
-  const { setLoading } = useContext(MainContext);
+  // const { setLoading } = useContext(MainContext);
   const [ ErrorMessage,setErrorMessage] = useState<string>('')
   const prevErrorMessage = useRef<string>(''); // برای جلوگیری از Toastهای مکرر
+  const products = useSelector((state:RootState)=>state.products.products)
+const {openNav} = useSelector((state:RootState)=>state.navnar)
 
   // استفاده از react-query برای دریافت محصولات
-  const { data: products = [], isLoading, isError, error } = useQuery({
+  const { data: fetchedProducts = [], isLoading, isError, error } = useQuery({
     queryKey: ['products'],
     queryFn: fetchProducts,
     retry: 2, // تلاش مجدد در صورت خطا
     staleTime: 5 * 60 * 1000, // کش برای 5 دقیقه
   });
+  //  // به‌روزرسانی loading و products در Redux store
+
+  useEffect(() => {
+    dispatch(setLoading(isLoading));
+    if (!isLoading && fetchedProducts.length > 0) {
+      dispatch(setProducts(fetchedProducts));
+    }
+  }, [isLoading, fetchedProducts, dispatch]);
 
   // به‌روزرسانی loading در context
-  useEffect(() => {
-    setLoading(isLoading);
-  }, [isLoading, setLoading]);
+  // useEffect(() => {
+  //   setLoading(isLoading);
+  // }, [isLoading, setLoading]);
 
   // نمایش پیام خطا با Toast
 // نمایش پیام خطا با Toast و div
@@ -148,8 +166,8 @@ const Tablepage = () => {
   }, [products]);
 
   // گروه‌بندی محصولات بر اساس تگ‌ها
-  const groupedProducts = selector.reduce((acc, item) => {
-    const filtered = products.filter((p) => p.tags?.includes(item.title) ?? false);
+   const groupedProducts = selector.reduce((acc, item) => {
+    const filtered = products.filter((p: { tags: string | string[]; }) => p.tags?.includes(item.title) ?? false);
     if (filtered.length > 0) {
       acc[item.title] = filtered;
       if (process.env.NODE_ENV !== 'production') {
@@ -159,10 +177,14 @@ const Tablepage = () => {
     return acc;
   }, {} as { [key: string]: Product[] });
 
+  const navOPEN =()=>{
+    dispatch(setOpenNav(!openNav))
+  }
+
   return (
-      <div className="w-full h-screen " dir="rtl">
+      <div className="w-full h-screen lg:w-[50%] mx-auto px-3" dir="rtl">
         <SpinnersNav />
-        <div className="container  mx-auto h-full py-4 overflow-y-auto">
+        <div className={` ${styles.container} mx-auto h-full py-4 overflow-y-auto`}>
            {ErrorMessage && (
           <div className=" text-white p-4 rounded-md mb-4 mx-4 text-center">
             {ErrorMessage}
@@ -172,7 +194,12 @@ const Tablepage = () => {
           {/* nav */}
           <div className="nav flex justify-between items-center py-4 px-3">
             <div className="text-2xl lg:text-4xl md:text-3xl">
-              <TiThMenu />
+              <button
+               className=''
+               onClick={navOPEN}
+               >
+                <TiThMenu />
+              </button>
             </div>
             <div className="text-lg lg:text-xl">بر روی میز</div>
             <div className="text-2xl lg:text-4xl md:text-3xl">
@@ -245,24 +272,32 @@ const Tablepage = () => {
                   className="mb-8 "
 
                 >
-                  <h2 className="text-xl font-bold mb-4">{tag}</h2>
-                  <ul className="flex flex-col gap-4">
+                  {/* <h2 className="text-xl font-bold mb-4">{tag}</h2> */}
+                  <ul className="flex flex-col gap-4 ">
                     {products.length > 0 ? (
                       products.map((item) => (
                         <li
                           key={item.id}
-                          className="p-4 bg-white rounded-lg shadow-md cursor-pointer"
+                          className="p-4 bg-white rounded-lg h-full  cursor-pointer shadow-box1"
                         >
+                          <Link href={`/menu/table/${item.id}`} className='w-full h-fit flex ' dir='rtl'>
+                          
+                        <div className="flex flex-col gap-2 justify-evenly ">
+                            <h3 className="text-lg font-semibold flex-1">{item.title}</h3>
+                          <p className="text-sm text-gray-600 flex-1">{item.description}</p>
+                          <div className="flex-1  flex justify-start items-center gap-5 px-4">
+                            <span className='text-3xl bg-teal-300 overflow-hidden rounded-md'><FaRegPlusSquare /></span>
+                          <p className="text-md font-bold  ">{item.price} تومان</p>
+                          </div>
+                        </div>
                           <Image
                             width={200}
                             height={200}
                             src={item.thumbnail || '/fallback-image.jpg'}
                             alt={item.title}
-                            className="w-full h-40 object-cover rounded-md mb-2"
+                            className="w-full  flex-1 shadow-box4 h-[145px] object-cover  rounded-md mb-2 bg-gray-500"
                           />
-                          <h3 className="text-lg font-semibold">{item.title}</h3>
-                          <p className="text-sm text-gray-600">{item.description}</p>
-                          <p className="text-md font-bold">{item.price} تومان</p>
+                          </Link>
                         </li>
                       ))
                     ) : (
