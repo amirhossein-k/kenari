@@ -7,7 +7,7 @@ import navReducer from './navbarSlice'
 export const store = configureStore({
     reducer:{
         products:productReducer,
-        navnar: navReducer
+        navnar: navReducer,
     }
 })
 

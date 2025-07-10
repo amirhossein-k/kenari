@@ -1,40 +1,26 @@
-export interface studentTypeRes {
+ export interface Product{
     id:number
-    user:string
-    password:string
-    name:string
-}
-export interface studentTypeReq {
-    user:string
-    password:string
-    name:string
+    title: string;
+  description: string;
+  price: number;
+  thumbnail: string;
+  tags: string[];
 }
 
-
-export interface UserType {
-    id: number;
-  name: string;
-  user: string;
-  posts: PostType[];
-  password:string
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  createdAt: any;
+// item1 ==> type of  ordermain
+interface Item1{
+    id:number
+    order:number,
+    price:number
 }
 
+// item2 ==> type of plus in to order
 
-export interface PostType{
-    id: number;
-  content: string;
-  userId: number;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  createdAt: any;
+
+export interface orderedProduct extends Omit<Product,'thumbnail'|"tags">{
+    userId: number,
+    item1: Item1[],
+    item2: Item1[]
+
 }
 
-export interface StudentType{
-    id: number
-    name:string
-    grade: string
-    gpa:number
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    createdAt:any
-}
