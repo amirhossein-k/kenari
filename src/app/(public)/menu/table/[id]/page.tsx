@@ -2,6 +2,7 @@
 'use server'
 
 import ClientProductPage from "@/components/products/ClientProductPage";
+import { notFound } from "next/navigation";
 
 interface Product {
   id: number;
@@ -10,6 +11,12 @@ interface Product {
   price: number;
   thumbnail: string;
   tags: string[];
+}
+
+interface PageProps {
+  params:{id:string}
+    searchParams?: { [key: string]: string | string[] | undefined };
+
 }
 
 async function fetchProduct(id:string):Promise<Product> {
@@ -30,7 +37,7 @@ async function fetchProduct(id:string):Promise<Product> {
   }
 }
 
-async function ProductPage({ params }: { params: { id: string } }) {
+async function ProductPage({ params }: PageProps ) {
 
   let product:Product| null = null
   let errorMessage = ''
@@ -39,7 +46,10 @@ async function ProductPage({ params }: { params: { id: string } }) {
   }catch(error){
        errorMessage = error instanceof Error ? error.message : 'خطایی رخ داده است';
   }
-
+  // اگر محصول وجود نداشته باشد، به صفحه 404 هدایت شو
+  if (!product) {
+    notFound();
+  }
 
 
   return (
