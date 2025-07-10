@@ -14,8 +14,8 @@ interface Product {
 }
 
 interface PageProps {
-  params:{id:string}
-    searchParams?: { [key: string]: string | string[] | undefined };
+  params:Promise<{id:string}>
+    searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
 
 }
 
@@ -39,10 +39,12 @@ async function fetchProduct(id:string):Promise<Product> {
 
 async function ProductPage({ params }: PageProps ) {
 
+  const {id} = await params
+
   let product:Product| null = null
   let errorMessage = ''
   try{
-    product = await fetchProduct(params.id)
+    product = await fetchProduct(id)
   }catch(error){
        errorMessage = error instanceof Error ? error.message : 'خطایی رخ داده است';
   }
