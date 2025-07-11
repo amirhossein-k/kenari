@@ -24,7 +24,7 @@ export default function Navbar() {
     }
   }, [width, metr]);
 
-  const { openNav } = useSelector((state: RootState) => state.navnar);
+  const { openNav } = useSelector((state: RootState) => state.navbar);
   useEffect(() => {
     toast(`${openNav === true ? "باز شد" : "بسته شد"}`, {
       duration: 4000,

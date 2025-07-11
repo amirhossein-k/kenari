@@ -1,5 +1,6 @@
 // src/store/productSlice.ts
 
+import { orderedProduct } from '@/types/types';
 import {createSlice,PayloadAction} from '@reduxjs/toolkit'
 
 interface Product{
@@ -11,22 +12,22 @@ interface Product{
   tags: string[];
 }
 
-// item1 ==> type of  ordermain
-interface Item1{
-    id:number
-    order:number,
-    price:number
-}
+// // item1 ==> type of  ordermain
+// interface Item1{
+//     id:number
+//     order:number,
+//     price:number
+// }
 
-// item2 ==> type of plus in to order
+// // item2 ==> type of plus in to order
 
 
-interface orderedProduct extends Omit<Product,'thumbnail'|"tags">{
-    userId: number,
-    item1: Item1,
-    item2: Item1
+// interface orderedProduct extends Omit<Product,'thumbnail'|"tags">{
+//     userId: number,
+//     item1: Item1,
+//     item2: Item1
 
-}
+// }
 
 
 interface ProductState {

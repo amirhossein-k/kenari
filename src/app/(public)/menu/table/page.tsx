@@ -10,12 +10,15 @@ import SpinnersNav from '@/features/SpinnerNav';
 // import { MainContext } from '@/context/MainContext';
 import toast from 'react-hot-toast';
 import Link from 'next/link';
-import { RootState } from '@/store';
-import { setProducts,setLoading } from '@/store/productSlice';
+import { RootState, store } from '@/store';
+import { setProducts, setLoading } from '@/store/productSlice';
 import { useDispatch, useSelector } from 'react-redux';
-import {setOpenNav} from '@/store/navbarSlice'
+import { setOpenNav } from '@/store/navbarSlice'
 import styles from '@/styles/center.module.scss'
 import { FaRegPlusSquare } from "react-icons/fa";
+import { FaShoppingCart } from "react-icons/fa";
+import { MdClose } from "react-icons/md";
+
 
 // تعریف تایپ برای محصولات
 interface Product {
@@ -76,11 +79,12 @@ const Tablepage = () => {
   const sectionRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
   const prevActiveSelector = useRef(activeSelector);
   // const { setLoading } = useContext(MainContext);
-  const [ ErrorMessage,setErrorMessage] = useState<string>('')
+  const [ErrorMessage, setErrorMessage] = useState<string>('')
   const prevErrorMessage = useRef<string>(''); // برای جلوگیری از Toastهای مکرر
-  const products = useSelector((state:RootState)=>state.products.products)
-const {openNav} = useSelector((state:RootState)=>state.navnar)
+  const products = useSelector((state: RootState) => state.products.products)
+  const { openNav } = useSelector((state: RootState) => state.navbar)
 
+  const productorder = useSelector((state: RootState) => state.products.productorder)
   // استفاده از react-query برای دریافت محصولات
   const { data: fetchedProducts = [], isLoading, isError, error } = useQuery({
     queryKey: ['products'],
@@ -91,6 +95,8 @@ const {openNav} = useSelector((state:RootState)=>state.navnar)
   //  // به‌روزرسانی loading و products در Redux store
 
   useEffect(() => {
+      console.log(store.getState(),'vass'); // بررسی وضعیت store
+
     dispatch(setLoading(isLoading));
     if (!isLoading && fetchedProducts.length > 0) {
       dispatch(setProducts(fetchedProducts));
@@ -103,7 +109,7 @@ const {openNav} = useSelector((state:RootState)=>state.navnar)
   // }, [isLoading, setLoading]);
 
   // نمایش پیام خطا با Toast
-// نمایش پیام خطا با Toast و div
+  // نمایش پیام خطا با Toast و div
   useEffect(() => {
     if (isError && error) {
       const message = error.message || 'خطایی رخ داده است';
@@ -118,6 +124,10 @@ const {openNav} = useSelector((state:RootState)=>state.navnar)
     }
   }, [isError, error, ErrorMessage]);
 
+  const [closePopover,setClosePopover] =useState<boolean>(false)
+  const handlePopverClose =()=>{
+    setClosePopover(false)
+  }
 
   // به‌روزرسانی prevActiveSelector
   useEffect(() => {
@@ -166,7 +176,7 @@ const {openNav} = useSelector((state:RootState)=>state.navnar)
   }, [products]);
 
   // گروه‌بندی محصولات بر اساس تگ‌ها
-   const groupedProducts = selector.reduce((acc, item) => {
+  const groupedProducts = selector.reduce((acc, item) => {
     const filtered = products.filter((p: { tags: string | string[]; }) => p.tags?.includes(item.title) ?? false);
     if (filtered.length > 0) {
       acc[item.title] = filtered;
@@ -177,119 +187,117 @@ const {openNav} = useSelector((state:RootState)=>state.navnar)
     return acc;
   }, {} as { [key: string]: Product[] });
 
-  const navOPEN =()=>{
+  const navOPEN = () => {
     dispatch(setOpenNav(!openNav))
   }
 
   return (
-      <div className="w-full h-screen lg:w-[50%] mx-auto px-3" dir="rtl">
-        <SpinnersNav />
-        <div className={` ${styles.container} mx-auto h-full py-4 overflow-y-auto`}>
-           {ErrorMessage && (
+    <div className="w-full h-screen lg:w-[50%] mx-auto px-3" dir="rtl">
+      <SpinnersNav />
+      <div className={` ${styles.container} mx-auto h-full py-4 overflow-y-auto relative`}>
+        {ErrorMessage && (
           <div className=" text-white p-4 rounded-md mb-4 mx-4 text-center">
             {ErrorMessage}
           </div>
         )}
 
-          {/* nav */}
-          <div className="nav flex justify-between items-center py-4 px-3">
-            <div className="text-2xl lg:text-4xl md:text-3xl">
-              <button
-               className=''
-               onClick={navOPEN}
-               >
-                <TiThMenu />
-              </button>
-            </div>
-            <div className="text-lg lg:text-xl">بر روی میز</div>
-            <div className="text-2xl lg:text-4xl md:text-3xl">
-              <FaAngleLeft />
-            </div>
+        {/* nav */}
+        <div className="nav flex justify-between items-center py-4 px-3">
+          <div className="text-2xl lg:text-4xl md:text-3xl">
+            <button
+              className=''
+              onClick={navOPEN}
+            >
+              <TiThMenu />
+            </button>
           </div>
-          {/* selector main */}
+          <div className="text-lg lg:text-xl">بر روی میز</div>
+          <div className="text-2xl lg:text-4xl md:text-3xl">
+            <FaAngleLeft />
+          </div>
+        </div>
+        {/* selector main */}
 
-          <div className="slector_main px-4  sticky -top-2 z-20 bg-white my-2">
+        <div className="slector_main px-4  sticky -top-2 z-20 bg-white my-2">
           <div className="px-4  absolute  -top-1 -z-10 h-[110px] bg-white my-2 w-full"></div>
-            <ul className="flex text-lg">
-              {selectorMain.map((item) => (
-                <li
-                  key={item.id}
-                  className={`cursor-pointer px-4 py-2 ${
-                    activeSelector === 'res' && item.title === 'res'
-                      ? 'border-b-2 border-black'
-                      : activeSelector !== 'res' && item.title === 'cafe'
+          <ul className="flex text-lg">
+            {selectorMain.map((item) => (
+              <li
+                key={item.id}
+                className={`cursor-pointer px-4 py-2 ${activeSelector === 'res' && item.title === 'res'
+                    ? 'border-b-2 border-black'
+                    : activeSelector !== 'res' && item.title === 'cafe'
                       ? 'border-b-2 border-black'
                       : ''
                   }`}
-                >
-                  {item.title}
-                </li>
-              ))}
-            </ul>
-          </div>
-          {/* selector */}
-          <div className="slector my-4 px-2 sticky top-[40px] bg-white z-20">
-            <ul className="flex gap-2">
-              {selector.map((item) => (
-                <li
-                  className={`px-5 py-2 text-md rounded-3xl cursor-pointer ${
-                    activeSelector === item.title ? 'bg-black text-white shadow-md' : 'bg-gray-200'
+              >
+                {item.title}
+              </li>
+            ))}
+          </ul>
+        </div>
+        {/* selector */}
+        <div className="slector my-4 px-2 sticky top-[40px] bg-white z-20">
+          <ul className="flex gap-2">
+            {selector.map((item) => (
+              <li
+                className={`px-5 py-2 text-md rounded-3xl cursor-pointer ${activeSelector === item.title ? 'bg-black text-white shadow-md' : 'bg-gray-200'
                   }`}
-                  key={item.id}
-                  onClick={() => {
-                    const section = sectionRefs.current[item.title];
-                    if (section) {
-                      section.scrollIntoView({ behavior: 'smooth' });
-                    }
-                  }}
-                >
-                  {item.title}
+                key={item.id}
+                onClick={() => {
+                  const section = sectionRefs.current[item.title];
+                  if (section) {
+                    section.scrollIntoView({ behavior: 'smooth' });
+                  }
+                }}
+              >
+                {item.title}
+              </li>
+            ))}
+          </ul>
+        </div>
+        {/* list of products */}
+        <div className="list px-4">
+          {isLoading ? (
+            <ul className="flex flex-col gap-4">
+              {Array(6).fill(0).map((_, index) => (
+                <li key={index}>
+                  <Skeleton isLoaded={false} className="w-full h-40 rounded-md" />
+                  <Skeleton isLoaded={false} className="w-3/4 h-6 mt-2 rounded-md" />
+                  <Skeleton isLoaded={false} className="w-full h-4 mt-2 rounded-md" />
+                  <Skeleton isLoaded={false} className="w-1/2 h-6 mt-2 rounded-md" />
                 </li>
               ))}
             </ul>
-          </div>
-          {/* list of products */}
-          <div className="list px-4">
-            {isLoading ? (
-              <ul className="flex flex-col gap-4">
-                {Array(6).fill(0).map((_, index) => (
-                  <li key={index}>
-                    <Skeleton isLoaded={false} className="w-full h-40 rounded-md" />
-                    <Skeleton isLoaded={false} className="w-3/4 h-6 mt-2 rounded-md" />
-                    <Skeleton isLoaded={false} className="w-full h-4 mt-2 rounded-md" />
-                    <Skeleton isLoaded={false} className="w-1/2 h-6 mt-2 rounded-md" />
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              Object.entries(groupedProducts).map(([tag, products]) => (
-                <div
-                  key={tag}
-                  ref={(el) => {
-                    sectionRefs.current[tag] = el;
-                  }}
-                  data-tag={tag}
-                  className="mb-8 "
+          ) : (
+            Object.entries(groupedProducts).map(([tag, products]) => (
+              <div
+                key={tag}
+                ref={(el) => {
+                  sectionRefs.current[tag] = el;
+                }}
+                data-tag={tag}
+                className="mb-8 "
 
-                >
-                  {/* <h2 className="text-xl font-bold mb-4">{tag}</h2> */}
-                  <ul className="flex flex-col gap-4 ">
-                    {products.length > 0 ? (
-                      products.map((item) => (
-                        <li
-                          key={item.id}
-                          className="p-4 bg-white rounded-lg h-full  cursor-pointer shadow-box1"
-                        >
-                          <Link href={`/menu/table/${item.id}`} className='w-full h-fit flex ' dir='rtl'>
-                          
-                        <div className="flex flex-col gap-2 justify-evenly ">
+              >
+                {/* <h2 className="text-xl font-bold mb-4">{tag}</h2> */}
+                <ul className="flex flex-col gap-4 ">
+                  {products.length > 0 ? (
+                    products.map((item) => (
+                      <li
+                        key={item.id}
+                        className="p-4 bg-white rounded-lg h-full  cursor-pointer shadow-box1"
+                      >
+                        <Link href={`/menu/table/${item.id}`} className='w-full h-fit flex ' dir='rtl'>
+
+                          <div className="flex flex-col gap-2 justify-evenly ">
                             <h3 className="text-lg font-semibold flex-1">{item.title}</h3>
-                          <p className="text-sm text-gray-600 flex-1">{item.description}</p>
-                          <div className="flex-1  flex justify-start items-center gap-5 px-4">
-                            <span className='text-3xl bg-teal-300 overflow-hidden rounded-md'><FaRegPlusSquare /></span>
-                          <p className="text-md font-bold  ">{item.price} تومان</p>
+                            <p className="text-sm text-gray-600 flex-1">{item.description}</p>
+                            <div className="flex-1  flex justify-start items-center gap-5 px-4">
+                              <span className='text-3xl bg-teal-300 overflow-hidden rounded-md'><FaRegPlusSquare /></span>
+                              <p className="text-md font-bold  ">{item.price} تومان</p>
+                            </div>
                           </div>
-                        </div>
                           <Image
                             width={200}
                             height={200}
@@ -297,20 +305,116 @@ const {openNav} = useSelector((state:RootState)=>state.navnar)
                             alt={item.title}
                             className="w-full  flex-1 shadow-box4 h-[145px] object-cover  rounded-md mb-2 bg-gray-500"
                           />
-                          </Link>
-                        </li>
-                      ))
-                    ) : (
-                      <li className="text-center text-gray-600">هیچ محصولی برای {tag} یافت نشد</li>
-                    )}
-                  </ul>
-                </div>
-              ))
-            )}
-          </div>
+                        </Link>
+                      </li>
+                    ))
+                  ) : (
+                    <li className="text-center text-gray-600">هیچ محصولی برای {tag} یافت نشد</li>
+                  )}
+                </ul>
+              </div>
+            ))
+
+          )}
+
         </div>
+          {productorder && productorder.length > 0 && (
+        <div className="navbot sticky bottom-12 w-full gap-3 right-0 flex bg-gray-300 p-3">
+                 
+
+
+          
+            <div className="flex  w-[95%] mx-auto relative m-0 p-0">
+              <span className='absolute top-[10px] cursor-default -right-3 rounded-md bg-red-300 px-2 py-1 z-30 '>{productorder.length}</span>
+
+              <Popover key={'blur'} showArrow={false} isOpen={closePopover} onOpenChange={(open)=>setClosePopover(open)} backdrop='blur' offset={-50} containerPadding={0} placement='bottom' className="z-[1000] m-0 p-0">
+                <PopoverTrigger className=''>
+                  <Button className='capitalize  w-full bg-sky-500 ' size='lg' variant='flat' style={{ width: '100%' }}
+                  onClick={()=>setClosePopover(true)}
+                  >
+                    تکمیل سبد خرید
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-screen  max-w-none overflow-x-hidden m-0 p-0">
+                  {(titleProps) => (
+                    <div className="m-0 p-2 w-full ">
+                      <span className='absolute top-0 right-2 p-2  bg-pink-400 cursor-pointer'
+                      onClick={handlePopverClose}
+                      > <MdClose /></span>
+                      <p className="text-small font-bold text-foreground flex gap-2 justify-center items-center" {...titleProps}>
+                        سبد خرید
+                        <FaShoppingCart />
+
+                      </p>
+                      <div className="mt-2 p-2 flex flex-col gap-2 w-full bg-red-300" dir='rtl'>
+                        
+                        {productorder.map(order => (
+                          <div className="w-full px-3" key={order.id}>
+                            <div className="titlee text-xl ">{order.title}</div>
+                            <div className=" bg-green-200 flex justify-between">
+                              {/*  */}
+                              <div className="riht">
+                                          <div className="subtitle text-lg px-4 "> {order.item1.title}</div>
+                            <ul className='px-7 text-lg'>
+                              {
+                                order.item2.map(it=>(
+                                  <li key={it.id} className='flex items-center gap-3 bg-blue-300' > 
+                                  <span>{it.title}</span>
+                                  <span className='flex  items-center p-1'>
+                                    <MdClose />
+                                    {it.counter}
+
+                                    </span>
+                                  </li>
+                                ))
+                              }
+                            </ul>
+                            <div className="price my-2 flex gap-4 text-medium">
+                              <span>قیمت:</span>
+                              <span>500 تومان</span>
+                            </div>
+                              </div>
+                              {/*  */}
+                              <div className="left bg-pink-500 relative w-[120px]  h-[100px] overflow-hidden  rounded-md">
+                                                          <Image
+                            // width={100}
+                            // height={100}
+                            fill
+                            src={"https://c589564.parspack.net/c589564//Starbucks.png"}
+                            alt={order.title}
+                            className="w-[120px] flex-1 shadow-box4 absolute  h-full object-cover overflow-hidden  rounded-md mb-2 bg-gray-500"
+                          />
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                        <div className="bottom flex justify-between p-2 gap-1 mx-3">
+                          <button className='bg-blue-200 w-[20%] rounded-md py-4 text-medium'>ثبت سفارش</button>
+                          <div className="w-[50%] text-center py-3 flex flex-col text-medium">
+                            <span>قیمت کل</span>
+                            450 
+                            تومان
+                          </div>
+                        </div>
+                      </div>
+
+                    </div>
+
+                  )}
+                </PopoverContent>
+              </Popover>
+            </div>
+        </div>
+          )
+          }
       </div>
+
+    </div>
+
   );
 };
 
+
 export default Tablepage;
+
+import { Popover, PopoverTrigger, PopoverContent, Button } from "@heroui/react";
