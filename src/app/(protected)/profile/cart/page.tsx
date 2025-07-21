@@ -22,7 +22,7 @@ import {
   useDisclosure,
 } from "@heroui/react";
 
-export const anam = [
+ const anam = [
   {key: "plan1", label: "5 هزار تومن"},
   {key: "plan2", label: "10  هزار تومن"},
   {key: "plan3", label: "15 هزار تومن"},
