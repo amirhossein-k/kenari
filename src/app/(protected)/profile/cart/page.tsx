@@ -1,15 +1,11 @@
 "use client";
 
-import { RootState } from "@/store";
-import { setOrderProduct } from "@/store/orderSlice";
-import { orderedProduct } from "@/types/types";
+
 // import Image from "next/image";
-import { useRouter } from "next/navigation";
 import React from "react";
 // import { CiTrash } from "react-icons/ci";
 // import { FaMinus, FaRegPlusSquare } from "react-icons/fa";
 // import { MdClose } from "react-icons/md";
-import { useDispatch, useSelector } from "react-redux";
 import { Tabs, Tab, Card, CardBody } from "@heroui/react";
 import { Accordion, AccordionItem } from "@heroui/react";
 import { BiSolidDownArrow } from "react-icons/bi";
@@ -61,7 +57,6 @@ const AnchorIcon = (props: any) => {
 const Cartpage = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
-  const dispatch = useDispatch();
 
   // const router = useRouter();
 
@@ -70,10 +65,7 @@ const [valuegarson, setValueGarson] = React.useState<Set<string>>(new Set());
 const [selectedDesk, setSelectedDesk] = React.useState<Set<string>>(new Set());
 
 
-  const productorder = useSelector(
-    (state: RootState) => state.orderShop.orderProduct
-  );
-
+ 
 
 
 
