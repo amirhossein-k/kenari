@@ -1,7 +1,7 @@
 // lib/auth.ts
 import { cookies } from "next/headers";
 import { GetUserAdmin } from "../../actions/GetUser";
-import { userType, USERTYPEAdmin } from "@/types/types";
+import {  USERTYPEAdmin } from "@/types/types";
 
 const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key"
 const encoder = new TextEncoder()

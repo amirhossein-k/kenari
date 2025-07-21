@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 // src\app\api\products\add\route.ts
 import { getSession } from "@/lib/auth";
 // import prisma from '@/lib/db';

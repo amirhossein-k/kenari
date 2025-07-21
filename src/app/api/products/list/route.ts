@@ -1,4 +1,4 @@
-import prisma from '@/lib/db'
+import { PrismaClient } from '@prisma/client';
 import { NextResponse } from 'next/server'
 // import { Post } from '@/app/(public)/products/page';
 interface User {
@@ -28,6 +28,8 @@ interface User {
   updatedAt:Date
   productImage: PHOTO[]
   }
+  const prisma = new PrismaClient()
+
   
 export async function GET() {
    
