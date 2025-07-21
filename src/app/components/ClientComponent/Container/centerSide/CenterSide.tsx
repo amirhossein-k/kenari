@@ -59,7 +59,7 @@ const CenterSide = () => {
             >
               <div className="one ">
                 <div className="top  text-center text-lg font-medium rounded-lg px-3 py-2">
-                  <Link href={'/menu/table'} className="w-full cursor-pointer block text-white">
+                  <Link href={'/menu/table'} className="w-full cursor-pointertext-lg font-medium  text-white bg-blue-600 rounded-lg  px-3 py-2 block" >
                     مشاهده منو بر روی میز
                   </Link>
                 </div>

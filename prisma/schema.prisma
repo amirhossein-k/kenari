@@ -14,29 +14,86 @@ datasource db {
 }
 
 model User {
-  id       Int     @id @default(autoincrement())
-  user     String
-  password String
-  name     String
-  posts   Post[]
+  id          String   @id
+  admin       Boolean
+  name        String
   createdAt   DateTime @default(now())
+  phoneNumber String   @unique
 
+  verify Boolean
+  code   String
 }
 
+model UserAdmin {
+  id          String @id
+  phoneNumber String @unique
+
+  verify    Boolean
+  code      String
+  name      String
+  posts     Post[]
+  admin     Boolean
+  createdAt DateTime @default(now())
+}
 
 model Post {
-  id   Int  @id @default(autoincrement())
-  content   String
-  userId Int
-  user  User  @relation(fields: [userId],references: [id])
-  createdAt  DateTime @default(now())
+  id           String         @id
+  title        String
+  price        Float
+  content      String?
+  tableContent String?
+  count        Float
+  countproduct Float
+  priceOffer   Float
+  listProperty ListProperty[]
+  tags         Tag[]
+  review       ReviewList[]
+  productImage ProductImage[]
+  published    Boolean        @default(false)
+  author       UserAdmin      @relation(fields: [authorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  authorId     String
+  categoryList CategoryList[]
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
 }
 
+model Tag {
+  id     String  @id
+  name   String
+  post   Post?   @relation(fields: [postId], references: [id])
+  postId String?
+}
 
-model Student {
-  id Int @id @default(autoincrement())
-  name  String
-  grade String
-  gpa  Float
+model ListProperty {
+  id          String @id
+  property    String
+  PropertyOwn Post   @relation(fields: [ownerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  ownerId     String
+}
+
+model ReviewList {
+  id         String   @id
+  reviewText String
+  name       String
+  email      String
+  rating     Float
   createdAt  DateTime @default(now())
+  reviewOwn  Post     @relation(fields: [ownerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  ownerId    String
+}
+
+model CategoryList {
+  id          String @id
+  category    String
+  CategoryOwn Post   @relation(fields: [ownerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  ownerId     String
+}
+
+model ProductImage {
+  id           String  @id
+  defaultImage Boolean
+  childImage   String
+  fileKey      String?
+  ImageOwn     Post?   @relation(fields: [ownerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  ownerId      String?
 }

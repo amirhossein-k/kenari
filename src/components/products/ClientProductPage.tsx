@@ -16,7 +16,8 @@ import {Spinner} from "@heroui/react";
 import { CiTrash } from "react-icons/ci";
 import { FaMinus } from "react-icons/fa";
 import { Item2, orderedProduct } from "@/types/types";
-import {setProductsShopOrder} from '@/store/productSlice'
+// import {setProductsShopOrder} from '@/store/productSlice'
+import {setOrderProduct } from '@/store/orderSlice'
 
 interface Product {
   id: number;
@@ -79,7 +80,7 @@ export const ListboxWrapper = ({ children }: { children: React.ReactNode }) => (
 
 const ClientProductPage = ({ product, errorMessage }: ProductProps) => {
 
-  const productorder = useSelector((state:RootState)=>state.products.productorder)
+  const productorder = useSelector((state:RootState)=>state.orderShop.orderProduct)
 
   // for first item
   const [selectedKeysItem, setSelectedKeysItem] = useState<Set<number>>(
@@ -198,7 +199,8 @@ const handleRemoveItem = (itemId: string) => {
         title:product.title,
         userId:0,
         item1:{id:selectedValue?.id ,title:selectedValue?.title},
-        item2
+        item2,
+        countOrder:1
   
       }
           const existingProductIndex = productorder.findIndex(p => p.id === product.id);
@@ -209,10 +211,10 @@ const handleRemoveItem = (itemId: string) => {
         item2: data.item2,
         item1:data.item1
       };
-      dispatch(setProductsShopOrder(updatedOrder));
+      dispatch(setOrderProduct(updatedOrder));
               }else{
                 // محصول وجود ندارد → به سبد اضافه کن
-      dispatch(setProductsShopOrder([...productorder, data]));
+      dispatch(setOrderProduct([...productorder, data]));
               }
 
 
