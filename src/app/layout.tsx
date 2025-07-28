@@ -11,7 +11,7 @@ import { Toaster } from "react-hot-toast";
 import { Providers } from "./Providers";
 import { HeroUIProvider } from "@heroui/system";
 import Head from "next/head";
-
+import { QueryClient, dehydrate } from "@tanstack/react-query";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -32,6 +32,9 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+
+  const queryClient = new QueryClient();
+  const dehydratedState = dehydrate(queryClient);
   return (
     <html lang="en">
       <Head>
@@ -53,8 +56,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased `}
       >
         <HeroUIProvider>
-          <Providers>
-            <Toaster position="top-center" />
+<Providers dehydratedState={dehydratedState}>            <Toaster position="top-center" />
             {children}
           </Providers>
         </HeroUIProvider>

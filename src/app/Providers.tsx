@@ -34,10 +34,14 @@ export function Providers({ children,  dehydratedState,
                 <PersistGate loading={null} persistor={persistor}>
 
         <Navbar />
-<HydrationBoundary state={dehydratedState}>
-
-        {children}
- </HydrationBoundary>
+{/* فقط در صورتی که dehydratedState وجود داشته باشد، HydrationBoundary رندر شود */}
+          {dehydratedState ? (
+            <HydrationBoundary state={dehydratedState}>
+              {children}
+            </HydrationBoundary>
+          ) : (
+            children
+          )}
                 </PersistGate>
 
       </QueryClientProvider>
