@@ -8,12 +8,14 @@ import { getProductById } from "../../../../../../actions/getProductById";
 
 
 // تعریف نوع دقیق برای params
+// تعریف نوع دقیق برای params
 interface Props {
-  params: Promise<{ id: string }> | { id: string }; // پشتیبانی از هر دو حالت Promise و شیء ساده
+  params: Promise<{ id: string }>; // فقط Promise پذیرفته می‌شود
 }
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const resolvedParams = await Promise.resolve(params);
-  const id = resolvedParams.id; // استخراج id
+  const { id } = await params; // استخراج id
+
   console.log(id, 'idddd in generateMetadata'); // چاپ id برای دیباگ
 const product = await getProductById(id);
   if (!product) return {};
@@ -41,8 +43,8 @@ const product = await getProductById(id);
 
 export default async function ProductPage({ params }: Props) {
 
-  const resolvedParams = await Promise.resolve(params);
-  const id = resolvedParams.id; // استخراج id
+  const { id } = await params; // استخراج id
+
   console.log(id, 'idddd in ProductPage'); // چاپ id برای دیباگ
   const productRes = await getProductById(id);
   // if (!product) return notFound();
