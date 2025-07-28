@@ -4,6 +4,7 @@ import React, { memo, useCallback, useEffect, useState } from 'react';
 import { WithContext as ReactTags, Tag } from 'react-tag-input';
 import toast from 'react-hot-toast';
 import styles from '@/styles/styles/Tagss.module.css'
+import { GenerateId } from '@/utils/generateID';
 
 interface TagType {
   id: string;
@@ -11,13 +12,13 @@ interface TagType {
   className?: string;
 }
 interface TagssProps {
-  onTagsChange?: (tags: string[]) => void;
+  onTagsChange?: (tags: TagType[]) => void;
 }
 
 const SUGGESTIONS: TagType[] = [
-  { id: 'ضد آب', text: 'ضد آب', className: '' },
-  { id: 'سبک', text: 'سبک', className: '' },
-  { id: 'مقاوم', text: 'مقاوم', className: '' },
+  { id: 'ضد آب', text: 'ضد آب',className:""},
+  { id: 'سبک', text: 'سبک',className:"" },
+  { id: 'مقاوم', text: 'مقاوم',className:"" },
 ];
 
 const Tagss = ({ onTagsChange }: TagssProps) => {
@@ -25,7 +26,7 @@ const Tagss = ({ onTagsChange }: TagssProps) => {
 
 
   useEffect(() => {
-    onTagsChange?.(tags.map((t) => t.text));
+    onTagsChange?.(tags);
   }, [tags, onTagsChange]);
 
   const handleDelete = useCallback((index: number) => {
@@ -45,14 +46,15 @@ const Tagss = ({ onTagsChange }: TagssProps) => {
       toast.error('حداکثر 8 تگ مجاز است');
       return;
     }
-    const newTag: TagType = { id: tag.text, text: tag.text, className: '' };
+
+    const newTag: TagType = { id: GenerateId('tag'), text: tag.text };
     setTags((prevTags) => [...prevTags, newTag]);
   }, [tags]);
 
   const handleDrag = useCallback((tag: Tag, currPos: number, newPos: number) => {
     setTags((prevTags) => {
       const newTags = [...prevTags];
-      const draggedTag: TagType = { id: tag.id, text: tag.id, className: '' };
+      const draggedTag: TagType = { id: tag.id, text: tag.id};
       newTags.splice(currPos, 1);
       newTags.splice(newPos, 0, draggedTag);
       return newTags;
@@ -70,7 +72,7 @@ const Tagss = ({ onTagsChange }: TagssProps) => {
     }
     setTags((prevTags) => {
       const updatedTags = [...prevTags];
-      updatedTags.splice(index, 1, { id: newTag.text, text: newTag.text, className: '' });
+      updatedTags.splice(index, 1, { id: newTag.text, text: newTag.text});
       return updatedTags;
     });
   }, []);
@@ -86,6 +88,7 @@ const Tagss = ({ onTagsChange }: TagssProps) => {
       <div>
         <ReactTags
           tags={tags.map(tag => ({ ...tag, className: tag.className || '' }))}
+          placeholder='تگ محصولات '
           inputFieldPosition="top"
           suggestions={SUGGESTIONS.map(suggestion => ({ ...suggestion, className: suggestion.className || '' }))}
           handleDelete={handleDelete}

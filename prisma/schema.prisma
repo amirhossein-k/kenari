@@ -34,6 +34,7 @@ model UserAdmin {
   posts     Post[]
   admin     Boolean
   createdAt DateTime @default(now())
+  idUser    String
 }
 
 model Post {
@@ -41,16 +42,12 @@ model Post {
   title        String
   price        Float
   content      String?
-  tableContent String?
   count        Float
   countproduct Float
-  priceOffer   Float
-  listProperty ListProperty[]
   tags         Tag[]
-  review       ReviewList[]
   productImage ProductImage[]
   published    Boolean        @default(false)
-  author       UserAdmin      @relation(fields: [authorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  author       UserAdmin?     @relation(fields: [authorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   authorId     String
   categoryList CategoryList[]
   createdAt    DateTime       @default(now())
@@ -58,35 +55,11 @@ model Post {
 }
 
 model Tag {
-  id     String  @id
-  name   String
-  post   Post?   @relation(fields: [postId], references: [id])
-  postId String?
-}
-
-model ListProperty {
-  id          String @id
-  property    String
-  PropertyOwn Post   @relation(fields: [ownerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  ownerId     String
-}
-
-model ReviewList {
-  id         String   @id
-  reviewText String
-  name       String
-  email      String
-  rating     Float
-  createdAt  DateTime @default(now())
-  reviewOwn  Post     @relation(fields: [ownerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  ownerId    String
-}
-
-model CategoryList {
-  id          String @id
-  category    String
-  CategoryOwn Post   @relation(fields: [ownerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  ownerId     String
+  id        String  @id
+  text      String
+  className String?
+  post      Post?   @relation(fields: [postId], references: [id])
+  postId    String
 }
 
 model ProductImage {
@@ -95,5 +68,14 @@ model ProductImage {
   childImage   String
   fileKey      String?
   ImageOwn     Post?   @relation(fields: [ownerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  ownerId      String?
+  ownerId      String
+  //   Products Products? @relation(fields: [productId],references: [id],onDelete: Cascade, onUpdate: Cascade) 
+  //   productId String?
+}
+
+model CategoryList {
+  id          String @id
+  category    String
+  CategoryOwn Post   @relation(fields: [ownerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  ownerId     String
 }

@@ -2,7 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   /* config options here */
-  reactStrictMode: true,
+  reactStrictMode: false,
   env: {
     LIARA_ENDPOINT: process.env.LIARA_ENDPOINT,
     LIARA_ACCESS_KEY_ID: process.env.LIARA_ACCESS_KEY_ID,

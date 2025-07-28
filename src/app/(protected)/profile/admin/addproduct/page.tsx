@@ -9,6 +9,10 @@ import { handleChangeCheckbox } from '@/utils/handleChangeCheckbox';
 import CustomEditor from '@/components/textEditor/CustomEditor';
 import { Select, SelectItem } from "@heroui/react";
 import Tagss from '@/components/Tags/Tagss';
+import { ADDProdut } from '../../../../../../actions/AddProduct';
+import { GenerateId } from '@/utils/generateID';
+import toast from 'react-hot-toast';
+import { resADDPOSTType } from '@/types/types';
 
 
 interface ImageObject {
@@ -69,6 +73,12 @@ const categories = [
   { key: "qhab", label: "قاب ها" },
 ];
 
+interface TagType {
+  id: string;
+  text: string;
+  className?: string;
+}
+
 export default function AddProduct() {
   const [selectedImageId, setSelectedImageId] = useState<string | null>(null);
   const [html, setHtml] = useState<string>("متن خود را اینجا وارد کنید...");
@@ -78,122 +88,79 @@ export default function AddProduct() {
   const [price, setPrice] = useState('');
   const [count, setCount] = useState<number>(0);
   const [countproduct, setCountproduct] = useState<number>(0);
-  const [priceOffer, setPriceOffer] = useState<number>(0);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [error, setError] = useState('');
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [dateOffer, setDateOffer] = useState<any>();
   const [imageDefult, setImageDefult] = useState('');
   const [detailImage, setDetailImage] = useState<ImageObject[]>([{ key: '', url: "", id: "" }])
   const [checkbox, setCheckbox] = useState('عدم انتشار')
   const router = useRouter();
-  const [tags, setTags] = useState<string[]>([]);
-  const [rows, setRows] = useState<number>(0);
-  const [columns, setColumns] = useState<number>(0);
-  const [tableData, setTableData] = useState<string[][]>([]);
+  const [tags, setTags] = useState<TagType[]>([]);
+  
   const [hasUnsavedChanges] = useState(true);
   useNavigationGuard(hasUnsavedChanges);
 
 
-  // به‌روزرسانی tableData بر اساس تعداد ردیف‌ها و ستون‌ها
-  useEffect(() => {
-    if (rows > 0 && columns > 0) {
-      const newTableData = Array.from({ length: rows }, () => Array(columns).fill(''));
-      setTableData(newTableData);
-    } else {
-      setTableData([]);
-    }
-  }, [rows, columns]);
 
-  // تبدیل tableData به HTML
-  const generateTableHTML = () => {
-    // بررسی خالی بودن یا تعریف‌نشده بودن tableData
-    if (!tableData || tableData.length === 0 || tableData.every(row => row.every(cell => cell === ''))) {
-      return ''; // رشته خالی در صورت نبود داده
-    }
-  
-    // تولید HTML جدول
-   // استفاده از کلاس‌های Tailwind برای جدول
-  let tableHTMLe = `
-    <table class="table-auto w-full border-collapse border border-gray-300 text-sm">
-      <tbody>
-  `;
-  tableData.forEach(row => {
-    tableHTMLe += '<tr class="odd:bg-gray-50">';
-    row.forEach(cell => {
-      tableHTMLe += `<td class="border border-gray-300 px-4 py-2 text-gray-800">${cell}</td>`;
-    });
-    tableHTMLe += '</tr>';
-  });
-  tableHTMLe += `
-      </tbody>
-    </table>
-  `;
-    return tableHTMLe;
-  };
 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log(price, 'html')
-    if (!name || !price) {
-      setError('لطفا همه فیلدها را پر کنید');
-      return;
+   
+console.log(tags,'tags')
+console.log(name,'title')
+console.log(price,'price')
+console.log(html,'html')
+console.log(html,'content')
+console.log(checkbox,'//pusblished')
+console.log(imageDefult,'img')
+console.log(`
+  iamg ==>> 
+  detailImage:${detailImage} |
+  imageDefult:${imageDefult} | 
+  selectedImageId: ${selectedImageId}
+  `)
+  console.log(countproduct,'countproduct')
+  console.log(count,'count')
+  console.log(countproduct,'countproduct')
+
+  const categoryArray = Array.from(selectedCategories).map(key=>{
+    return{
+      id:GenerateId('category'),
+      category:key
     }
-    const categoryArray = Array.from(selectedCategories);
-    const tableHTML = generateTableHTML();
+  })
+  console.log(categoryArray,'category')
 
-    // 1. ساخت HTML جدول از داده‌ها
-
-  // 2. اگر جدول وجود دارد، فقط همین قسمت را نگه دار
- 
-  const fullContenttt = tableHTML
-    ? `${html}<br>${tableHTML}`
-    : html;
-
-
-    console.log(fullContenttt, 'tableContent');
-    // try {
-    console.log(">>> Payload to send:", {
-  tableContent: fullContenttt,
   
-});
-    const payload = JSON.stringify({ name, price, html, checkbox,
-      tableContent: fullContenttt,      detailImage, imageDefult,
-       selectedImageId, count, countproduct, priceOffer, category: categoryArray,tags  })
-    console.log(payload, 'ersal')
-    const res = await fetch('/api/products/add', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: payload,
-    });
+  
+const payload =  {
+  title:name,
+  price,
+  content: html,
+  checkbox, //pusblished
+  detailImage, imageDefult,selectedImageId, //image
+countproduct,count,
+  category: categoryArray,
+  tags
+}
 
-    if (res.ok) {
-      // به احتمال زیاد پاسخ حاوی JSON است، اما اگر ممکن است خالی باشد:
-      const text = await res.text();
-      try {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const data = text ? JSON.parse(text) : {};
-        router.push('/products/list');
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      } catch (err) {
-        setError("خطا در پردازش پاسخ سرور");
-      }
-    } else {
-      const data = await res.json();
-      setError(data.error || 'خطایی رخ داده است');
-    }
+const data:resADDPOSTType = await ADDProdut(payload)
+    console.log(data,'client res')
 
 
+  console.log(data,'data add client ')
+if (data?.success) {
+  toast.success(data.message)
+router.push('/menu/table')
+}else{
+  toast.error(data.error)
+}
 
   };
 
   const handleDefultImage = (img: ImageObject) => {
-    // const src = e.currentTarget.src
-    // const find = src.('uploads%2F')
-    // const r = src.slice(find+1)
-    // console.log(find,'eee')
+
     const match = img.url.match(/uploads%2F(.*?)(?=&|$)/);
 
     const r = match ? decodeURIComponent(match[1]) : '';
@@ -205,10 +172,9 @@ export default function AddProduct() {
 
     console.log(img, 'scr')
   }
-  // useEffect(()=>{},[checkbox])
-  console.log(detailImage, 'image')
-  console.log(checkbox, 'chevk')
+
   return (
+
     <div className="max-w-md mx-auto mt-10 p-6 bg-white rounded-lg shadow-md text-black">
       <h1 className="text-2xl font-bold mb-6 text-center">افزودن محصول</h1>
 
@@ -235,27 +201,8 @@ export default function AddProduct() {
 
           />
         </div>
-        <div>
-          <label className="block mb-2">تخفیف:</label>
-          <input
-            type="number"
-            value={priceOffer}
-            onChange={(e) => setPriceOffer(Number(e.target.value))}
-            className="w-full p-2 border rounded"
-
-          />
-        </div>
-         <div>
-          <label className="block mb-2">مدت زمان تخفیف :</label>
-          <span className='text-sm '>تاریخ به میلادی وارد شود روز/ماه/سال/ساعت</span>
-          <input
-            type="text"
-            value={dateOffer}
-            onChange={(e) => setDateOffer(e.target.value)}
-            className="w-full p-2 border rounded"
-
-          />
-        </div>
+     
+        
         <div>
         <Tagss onTagsChange={setTags}/>
         </div>
@@ -312,51 +259,9 @@ export default function AddProduct() {
           </div>
           
         </div>
- {/* فیلدهای ورودی برای تعداد ردیف و ستون */}
- <div>
-          <label className="block mb-2">تعداد ردیف‌ها:</label>
-          <input
-            type="number"
-            value={rows}
-            onChange={(e) => setRows(Number(e.target.value))}
-            className="w-full p-2 border rounded"
-          />
-        </div>
-        <div>
-          <label className="block mb-2">تعداد ستون‌ها:</label>
-          <input
-            type="number"
-            value={columns}
-            onChange={(e) => setColumns(Number(e.target.value))}
-            className="w-full p-2 border rounded"
-          />
-        </div>
+ 
 
-        {/* فیلدهای ورودی برای سلول‌های جدول */}
-        {rows > 0 && columns > 0 && (
-          <div>
-            <h2 className="text-xl font-bold mb-4">ورود داده‌های جدول</h2>
-            {tableData.map((row, rowIndex) => (
-              <div key={rowIndex} className="flex space-x-2 mb-2">
-                {row.map((cell, colIndex) => (
-                  <input
-                    key={`${rowIndex}-${colIndex}`}
-                    type="text"
-                    value={cell}
-                    onChange={(e) => {
-                      const newTableData = [...tableData];
-                      newTableData[rowIndex][colIndex] = e.target.value;
-                      setTableData(newTableData);
-                    }}
-                    className="w-full p-2 border rounded"
-                    placeholder={`ردیف ${rowIndex + 1}, ستون ${colIndex + 1}`}
-                  />
-                ))}
-              </div>
-            ))}
-          </div>
-        )}
-
+     
         {error && <p className="text-red-500 text-sm">{error}</p>}
 
         <button

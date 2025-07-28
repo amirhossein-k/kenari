@@ -15,18 +15,14 @@ export async function GetUserAdmin(id: string) {
        const user: USERTYPEAdmin | null = await prisma.userAdmin.findUnique({
   where: { id },
   include: {
-    posts: {
-      include: {
-        productImage: true,
-        categoryList: true,
-        review: true,
-        listProperty: true,
-        tags:true,
+    posts:{include:{
+      categoryList:true,
+      tags:true,
+      productImage:true,
+      
 
 
-      }
-    },
-
+    }}
   }
 })
 

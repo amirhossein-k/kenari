@@ -52,10 +52,9 @@ console.log('before')
 
 
 
-    return NextResponse.json(
-      { success: true, message: "پست جدید ذخیره شد" },
-      { status: 201 }
-    );
+return { success: true, message: "پست جدید ذخیره شد" };
+
+ 
   } catch (error) {
     console.log(error, 'error login error');
     return NextResponse.json(

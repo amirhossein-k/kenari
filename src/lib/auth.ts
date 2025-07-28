@@ -53,13 +53,14 @@ export async function getSession(cookieHeader?: string): Promise<USERTYPEAdmin |
     if (!sessionCookie) return null;
     return JSON.parse(decodeURIComponent(sessionCookie))  as USERTYPEAdmin;
   }
-
+console.log('getSession')
   // منطق کامپوننت‌های سرور
   
   const cookieStore = await cookies(); // بدون await
   const sessionCookie = cookieStore.get('tokken')?.value;
+  console.log(sessionCookie,'tokken')
   const user = sessionCookie ? await verifyJWT(sessionCookie) : null
-  console.log(user,'uer midlleware')
+  console.log(user,'uer getSession')
   //get detail user
   if(sessionCookie){
 const oop = user as { id: string };

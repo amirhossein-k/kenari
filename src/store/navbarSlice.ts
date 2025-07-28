@@ -16,6 +16,7 @@ const NavSlice = createSlice({
     initialState,
     reducers:{
         setOpenNav :(state,action:PayloadAction<boolean>)=>{
+            console.log("setOpenNav called with:", action.payload);
                 state.openNav = action.payload
         }
     }

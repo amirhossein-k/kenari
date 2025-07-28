@@ -43,18 +43,19 @@ export interface userType{
 
 
 export interface  TagType {
-   id:string,
-   name  :string
-
+    id: string;
+  text: string;
+  className?: string | null; // ← اضافه شود null
 }
 
 // admin
 export interface USERTYPEAdmin {
     id        :string
     
-   
+   phoneNumber : string
+   code: string
     name     :string|null
-    posts   :  POSTTYPE[]
+    posts?   :  POSTTYPE[]
     createdAt :Date
     verify: boolean;
     admin:   boolean
@@ -78,7 +79,6 @@ export interface FormattedPostType extends Omit<POSTTYPE, 'createdAt' | 'updated
 
 
    export interface POSTTYPE {
-    quantity? : string
     id     :  string
     content? :string | null
     title:string
@@ -86,29 +86,40 @@ export interface FormattedPostType extends Omit<POSTTYPE, 'createdAt' | 'updated
     price:number
     count :number
     countproduct : number
-    priceOffer : number
     author? :USERTYPEAdmin
     authorId :string
     createdAt :Date
     updatedAt:Date
     productImage: PHOTO[]
     categoryList: Category[]
-    review: Review[]
+ 
     tags: TagType[]
-    // tableContent?: string; // اختیاری کردن tableContent
-    tableContent:string | null
   }
-  export interface Review{
-    reviewText: string
-    name     :  string
-    email    :  string
-    createdAt : Date 
-    rating   :number
+
+
+     export interface POSTTYPERedux {
+    id     :  string
+    content? :string | null
+    title:string
+    published :boolean
+    price:number
+    count :number
+    countproduct : number
+    author? :USERTYPEAdmin
+    authorId :string
+    createdAt :string
+    updatedAt:string
+    productImage: PHOTO[]
+    categoryList: Category[]
+ 
+    tags: TagType[]
   }
+
 
   export interface Category{
     id: string
     category :string
+    
   }
 
  export interface ADRESS {
@@ -118,3 +129,22 @@ export interface FormattedPostType extends Omit<POSTTYPE, 'createdAt' | 'updated
     id: string
     userId:string
   }
+
+  export interface resADDPOSTType{
+  error:string,
+                status:number,
+                success:boolean,
+                message:string
+                
+  }
+
+export  type GetProductByIdResult =
+  | { success: true; status: number; message: string; data: POSTTYPE }
+  | { success: false; status: number; error: string; message: string; data: null };
+
+
+  export type GetAllProductsResult =
+  | { success: true; status: number; message: string; data: POSTTYPE[] }
+  | { success: false; status: number; error: string; message: string; data: null };
+
+

@@ -1,16 +1,16 @@
 // src/store/productSlice.ts
 
-import { orderedProduct } from '@/types/types';
+import { orderedProduct, POSTTYPERedux } from '@/types/types';
 import {createSlice,PayloadAction} from '@reduxjs/toolkit'
 
-interface Product{
-    id:number
-    title: string;
-  description: string;
-  price: number;
-  thumbnail: string;
-  tags: string[];
-}
+// interface Product{
+//     id:number
+//     title: string;
+//   description: string;
+//   price: number;
+//   thumbnail: string;
+//   tags: string[];
+// }
 
 // // item1 ==> type of  ordermain
 // interface Item1{
@@ -31,7 +31,7 @@ interface Product{
 
 
 interface ProductState {
-    products:Product[]
+    products:POSTTYPERedux[]
     loading:boolean,
     productorder:orderedProduct[]
 }
@@ -47,7 +47,7 @@ const productSlice = createSlice({
     name:"products",
     initialState,
     reducers:{
-        setProducts: (state,action:PayloadAction<Product[]>) =>{
+        setProducts: (state,action:PayloadAction<POSTTYPERedux[]>) =>{
             state.products = action.payload
         },
         setLoading: (state,action:PayloadAction<boolean> ) =>{

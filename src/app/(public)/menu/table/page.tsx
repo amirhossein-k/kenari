@@ -1,3 +1,4 @@
+// src\app\(public)\menu\table\page.tsx
 "use client";
 import React, { useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -9,7 +10,7 @@ import SpinnersNav from "@/features/SpinnerNav";
 // import { MainContext } from '@/context/MainContext';
 import toast from "react-hot-toast";
 import Link from "next/link";
-import { RootState, store } from "@/store";
+import { RootState } from "@/store";
 import { setProducts, setLoading } from "@/store/productSlice";
 // import {setOrderProduct} from '@/store/orderSlice'
 import { useDispatch, useSelector } from "react-redux";
@@ -21,14 +22,7 @@ import { MdClose } from "react-icons/md";
 import { CiTrash } from "react-icons/ci";
 
 // تعریف تایپ برای محصولات
-interface Product {
-  id: number;
-  title: string;
-  description: string;
-  price: number;
-  thumbnail: string;
-  tags: string[];
-}
+
 
 const selectorMain = [
   { id: "14", title: "cafe", icone: "", active: true },
@@ -36,53 +30,24 @@ const selectorMain = [
 ];
 
 const selector = [
-  { id: "1", title: "beauty", icone: "", active: true },
-  { id: "2", title: "eyeshadow", icone: "", active: false },
-  { id: "3", title: "mascara", icone: "", active: false },
-  { id: "4", title: "face powder", icone: "", active: false },
-  { id: "5", title: "lipstick", icone: "", active: false },
-  { id: "6", title: "res", icone: "", active: false },
+  { id: "1", category: "lavazemKhane",  active: true },
+  { id: "2", category: "eyeshadow", active: false },
+  { id: "3", category: "mascara", active: false },
+  { id: "4", category: "face powder", active: false },
+  { id: "5", category: "lipstick", active: false },
+  { id: "6", category: "res", active: false },
 ];
 
-// تابع fetch برای دریافت محصولات
-const fetchProducts = async (): Promise<Product[]> => {
-  try {
-    const response = await fetch("https://dummyjson.com/products", {
-      signal: AbortSignal.timeout(5000),
-    });
-    if (!response.ok) {
-      throw new Error("خطا در دریافت محصولات");
-    }
-    const data = await response.json();
-    if (!Array.isArray(data.products)) {
-      throw new Error(
-        "محصولات نمی‌توانند فرایند مورد نیاز روی آن‌ها صورت گیرند"
-      );
-    }
-    return data.products.map((item: Product) => {
-      const isRes = item.tags.some((tag) =>
-        ["groceries", "kitchen-accessories"].includes(tag)
-      );
-      return {
-        ...item,
-        tags: isRes ? [...item.tags, "res"] : item.tags,
-      };
-    });
-  } catch (error) {
-    // بررسی خطای شبکه
-    if (error instanceof Error && error.message.includes("Failed to fetch")) {
-      throw new Error("اینترنت وصل نیست");
-    }
-    throw error; // سایر خطاها به همان صورت پرتاب می‌شوند
-  }
-};
+
+
+
 
 
 const Tablepage = () => {
   const router = useRouter()
   const dispatch = useDispatch();
   const [activeSelector, setActiveSelector] = React.useState(
-    selector[0]?.title || "beauty"
+    selector[0]?.category || "beauty"
   );
   const sectionRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
   const prevActiveSelector = useRef(activeSelector);
@@ -98,27 +63,40 @@ const Tablepage = () => {
     (state: RootState) => state.orderShop.orderProduct
   );
   // استفاده از react-query برای دریافت محصولات
-  const {
-    data: fetchedProducts = [],
+
+    const {
+    data: productResult ,
     isLoading,
     isError,
     error,
-  } = useQuery({
+  } = useQuery<GetAllProductsResult>({
     queryKey: ["products"],
-    queryFn: fetchProducts,
-    retry: 2, // تلاش مجدد در صورت خطا
+    queryFn: getProductAll,
+    retry: 2,// تلاش مجدد در صورت خطا
     staleTime: 5 * 60 * 1000, // کش برای 5 دقیقه
   });
   //  // به‌روزرسانی loading و products در Redux store
 
+  // اعمال منطق تگ‌ها و به‌روزرسانی Redux store
   useEffect(() => {
-    console.log(store.getState(), "vass"); // بررسی وضعیت store
-
     dispatch(setLoading(isLoading));
-    if (!isLoading && fetchedProducts.length > 0) {
-      dispatch(setProducts(fetchedProducts));
+    if (!isLoading && productResult?.success && productResult.data?.length > 0) {
+      const modifiedProducts = productResult.data.map((item: POSTTYPE) => {
+        const isRes = item.tags?.some((tag) => tag?.text && ["groceries", "kitchen-accessories"].includes(tag.text)) || false;
+        const alreadyHasRes = item.tags?.some((tag) => tag?.text === "res") || false;
+        const newTags: TagType[] = isRes && !alreadyHasRes
+          ? [...(item.tags || []), { id: "res", text: "res", className: null }]
+          : item.tags || [];
+        return {
+          ...item,
+          tags: newTags,
+          createdAt: item.createdAt instanceof Date ? item.createdAt.toISOString() : item.createdAt,
+          updatedAt: item.updatedAt instanceof Date ? item.updatedAt.toISOString() : item.updatedAt,
+        };
+      });
+      dispatch(setProducts(modifiedProducts));
     }
-  }, [isLoading, fetchedProducts, dispatch]);
+  }, [isLoading, productResult, dispatch]);
 
   // به‌روزرسانی loading در context
   // useEffect(() => {
@@ -168,11 +146,11 @@ const Tablepage = () => {
           visibleEntries[0]
         );
         if (mostVisible) {
-          const tag = mostVisible.target.getAttribute("data-tag");
+          const category  = mostVisible.target.getAttribute("data-category");
           if (process.env.NODE_ENV !== "production") {
             console.log(
-              "Most visible tag:",
-              tag,
+              "Most visible category:",
+              category,
               "Ratio:",
               mostVisible.intersectionRatio,
               "Element:",
@@ -180,13 +158,13 @@ const Tablepage = () => {
             );
           }
           if (
-            tag &&
-            selector.some((item) => item.title === tag) &&
-            tag !== prevActiveSelector.current
+            category &&
+            selector.some((item) => item.category === category) &&
+            category !== prevActiveSelector.current
           ) {
-            setActiveSelector(tag);
+            setActiveSelector(category);
           } else if (process.env.NODE_ENV !== "production") {
-            console.warn("Invalid or same tag:", tag);
+            console.warn("Invalid or same category:", category);
           }
         }
       },
@@ -205,18 +183,24 @@ const Tablepage = () => {
   }, [products]);
 
   // گروه‌بندی محصولات بر اساس تگ‌ها
-  const groupedProducts = selector.reduce((acc, item) => {
-    const filtered = products.filter(
-      (p: { tags: string | string[] }) => p.tags?.includes(item.title) ?? false
-    );
-    if (filtered.length > 0) {
-      acc[item.title] = filtered;
-      if (process.env.NODE_ENV !== "production") {
-        console.log(`Group ${item.title}:`, filtered.length, "products");
-      }
+// گروه‌بندی محصولات بر اساس تگ‌ها
+
+const groupedProducts = selector.reduce((acc, item) => {
+  const filtered = products.filter((p: POSTTYPERedux) =>
+    p.categoryList?.some((categoryItem) => categoryItem.category === item.category)
+  );
+
+  if (filtered.length > 0) {
+    acc[item.category] = filtered;
+
+    if (process.env.NODE_ENV !== "production") {
+      console.log(`Group ${item.category}:`, filtered.length, "products");
     }
-    return acc;
-  }, {} as { [key: string]: Product[] });
+  }
+
+  return acc;
+}, {} as { [key: string]: POSTTYPERedux[] });
+
 
   const navOPEN = () => {
     dispatch(setOpenNav(!openNav));
@@ -308,19 +292,19 @@ const updatedOrder = productorder.filter((order) => order.id !== itemId);
             {selector.map((item) => (
               <li
                 className={`px-5 py-2 text-md rounded-3xl cursor-pointer ${
-                  activeSelector === item.title
+                  activeSelector === item.category
                     ? "bg-black text-white shadow-md"
                     : "bg-gray-200"
                 }`}
                 key={item.id}
                 onClick={() => {
-                  const section = sectionRefs.current[item.title];
+                  const section = sectionRefs.current[item.category];
                   if (section) {
                     section.scrollIntoView({ behavior: "smooth" });
                   }
                 }}
               >
-                {item.title}
+                {item.category}
               </li>
             ))}
           </ul>
@@ -380,7 +364,7 @@ const updatedOrder = productorder.filter((order) => order.id !== itemId);
                               {item.title}
                             </h3>
                             <p className="text-sm text-gray-600 flex-1">
-                              {item.description}
+                              {item.content}
                             </p>
                             <div className="flex-1  flex justify-start items-center gap-5 px-4">
                               <span className="text-3xl bg-teal-300 overflow-hidden rounded-md">
@@ -394,7 +378,7 @@ const updatedOrder = productorder.filter((order) => order.id !== itemId);
                           <Image
                             width={200}
                             height={200}
-                            src={item.thumbnail || "/fallback-image.jpg"}
+        src={item.productImage.length !== 0 ? item.productImage.filter((item: PHOTO) => item.defaultImage === true)[0].childImage : ""}
                             alt={item.title}
                             className="w-full  flex-1 shadow-box4 h-[145px] object-cover  rounded-md mb-2 bg-gray-500"
                           />
@@ -576,6 +560,7 @@ const updatedOrder = productorder.filter((order) => order.id !== itemId);
 export default Tablepage;
 
 import { Popover, PopoverTrigger, PopoverContent, Button } from "@heroui/react";
-import { orderedProduct } from "@/types/types";
+import { GetAllProductsResult, orderedProduct, PHOTO, POSTTYPE, POSTTYPERedux, TagType } from "@/types/types";
 import { setOrderProduct } from "@/store/orderSlice";import { useRouter } from "next/navigation";
+import { getProductAll } from "../../../../../actions/getProductAll";
 

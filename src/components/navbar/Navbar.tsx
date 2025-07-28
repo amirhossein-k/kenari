@@ -2,7 +2,7 @@
 
 import { RootState } from "@/store";
 import {  useEffect, useState } from "react";
-import toast from "react-hot-toast";
+// import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
 import useWindowSize from "../../../hooks/size";
 import { setOpenNav } from "@/store/navbarSlice";
@@ -17,6 +17,7 @@ export default function Navbar() {
   const [mobile, setMobile] = useState(false);
   const dispatch = useDispatch();
   const router = useRouter();
+  // تنظیم mobile بر اساس عرض صفحه
 
   useEffect(() => {
     if (width) {
@@ -25,12 +26,16 @@ export default function Navbar() {
   }, [width, metr]);
 
   const { openNav } = useSelector((state: RootState) => state.navbar);
-  useEffect(() => {
-    toast(`${openNav === true ? "باز شد" : "بسته شد"}`, {
-      duration: 4000,
-      position: "top-center",
-    });
-  }, [openNav]);
+  // نمایش toast فقط هنگام تغییر عمدی openNav
+  // useEffect(() => {
+  //   if (openNav !== undefined) {
+  //     console.log("toast executed", openNav); // دیباگ
+  //     toast(`${openNav ? "باز شد" : "بسته شد"}`, {
+  //       duration: 4000,
+  //       position: "top-center",
+  //     });
+  //   }
+  // }, [openNav]);
   const navOPEN = () => {
     dispatch(setOpenNav(!openNav));
   };
