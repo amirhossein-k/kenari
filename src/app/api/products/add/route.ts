@@ -51,7 +51,7 @@ console.log('before')
 
 
 
-
+return NextResponse.json({ success: true, message: "پست جدید ذخیره شد" });
 return { success: true, message: "پست جدید ذخیره شد" };
 
  
