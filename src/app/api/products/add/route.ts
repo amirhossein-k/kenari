@@ -34,27 +34,19 @@ interface ProductRequest {
 
 export async function POST(request: Request) {
   try {
-   
-
-
     const session = await getSession();
     console.log(session, 'sesiion data');
-    console.log(session?.id,'sesiion data id');
+    console.log(session?.id, 'sesiion data id');
     if (!session) {
       return NextResponse.json(
         { error: 'کاربر احراز هویت نشده است' },
         { status: 401 }
       );
     }
-console.log('before')
-// console.log(">>> Received tableContent on server:", tableContent);
+    console.log('before');
 
-
-
-return NextResponse.json({ success: true, message: "پست جدید ذخیره شد" });
-return { success: true, message: "پست جدید ذخیره شد" };
-
- 
+    // تغییر به NextResponse.json
+    return NextResponse.json({ success: true, message: "پست جدید ذخیره شد" });
   } catch (error) {
     console.log(error, 'error login error');
     return NextResponse.json(
